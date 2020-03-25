@@ -1,0 +1,6 @@
+This will be Queue ADT that will simulate shoppers lining up to be processed.
+
+TODO:
+1) Create constructor
+2) create a way to add to the Queue
+3) finish your toString method
