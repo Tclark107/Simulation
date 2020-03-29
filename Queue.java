@@ -6,11 +6,28 @@
 
 public class Queue implements QueueInterface {
 
-    // private variables
-
     // Node Constructor
+    private class Node {
+        Object obj;
+        Node next;
+
+        Node(Object x){
+            obj = x;
+            next = null;
+        }
+    }
+    
+    // private variables
+    private int len;
+    private Node front;
+    private Node back;
 
     // Queue Constructor
+    public Queue(){
+        len = 0;
+        front = null;
+        back = null;
+    }
     
     //------------------------------------------------------------------------------------------------------------------------
     // Accessors
@@ -19,17 +36,12 @@ public class Queue implements QueueInterface {
     // isEmpty()
     // pre: none
     // post: returns true if this Queue is empty, false otherwise
-    public boolean isEmpty(){
-        return true;
-    }
+    public boolean isEmpty() {return (len == 0);}
  
     // length()
     // pre: none
     // post: returns the length of this Queue.
-    public int length() {
-        int x = 0;
-        return x;
-    }
+    public int length() { return len;}
  
     //------------------------------------------------------------------------------------------------------------------------
     // Manipulators
@@ -40,7 +52,15 @@ public class Queue implements QueueInterface {
     // pre: none
     // post: !isEmpty()
     public void enqueue(Object newItem) {
-
+        Node N = new Node(newItem);
+        if(len == 0) {
+            front = N;
+            back = N;
+        } else {
+            back.next = N;
+            back = N;
+        }
+        len++;
     }
  
     // dequeue()
@@ -48,16 +68,30 @@ public class Queue implements QueueInterface {
     // pre: !isEmpty()
     // post: this Queue will have one fewer element
     public Object dequeue() throws QueueEmptyException {
-        Object x;
-        return x;
+        if(!isEmpty()) {
+            Node N = front;
+            if(len == 1) {
+                back = null;
+                front = null;
+            } else {
+                front = front.next;
+            }
+            len--;
+            return N.obj;
+        } else {
+            throw new QueueEmptyException("Queue Error: Dequeue() called on empty Queue.");
+        }
     }
  
     // peek()
     // pre: !isEmpty()
     // post: returns item at front of Queue
     public Object peek() throws QueueEmptyException {
-        Object x;
-        return x;
+        if(!isEmpty()){
+            return front.obj;
+        } else {
+            throw new QueueEmptyException("Queue Error: peek() called on empty Queue.");
+        }
     }
  
     // dequeueAll()
@@ -65,7 +99,13 @@ public class Queue implements QueueInterface {
     // pre: !isEmpty()
     // post: isEmpty()
     public void dequeueAll() throws QueueEmptyException {
-
+        if(!isEmpty()) {
+            front = null;
+            back = null;
+            len = 0;
+        } else {
+            throw new QueueEmptyException("Queue Error: dequeueAll() called on empty Queue.");
+        }
     }
 
     //------------------------------------------------------------------------------------------------------------------------
@@ -75,8 +115,12 @@ public class Queue implements QueueInterface {
     // toString()
     // overrides Object's toString() method
     public String toString() {
-        String a = "";
-        return a;
+        StringBuffer sb = new StringBuffer();
+        Node N = front;
+        for(;N != null; N = N.next) {
+            sb.append(N.obj).append(" ");
+        }
+        return new String(sb);
     }
 
 }
