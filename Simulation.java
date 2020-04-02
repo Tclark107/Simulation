@@ -175,6 +175,7 @@ class Simulation {
         int temp;
         int time;
         boolean breakFlag = false;
+        boolean printFlag = false;
 
         // run the program on n processor Queues
         for(int n = 1; n < m; n++) {
@@ -227,7 +228,7 @@ class Simulation {
                 if(finishTimes[fTimeCurr] == time) {
                     //System.out.println("FinishTime at current: " + finishTimes[fTimeCurr] + ", time: " + time);
                     for (int i = 0; i < n; i++) {
-                        System.out.println("processor:" + (i+1) + ", departures");
+                        //System.out.println("processor:" + (i+1) + ", departures");
                         if(dTime[i] == time) {
                             if(!processor[i].isEmpty()) {
                                 if(processor[i].length() == minLength) {
@@ -256,7 +257,7 @@ class Simulation {
                 if (arrivalTime == time) {
                     //System.out.println("arrivaltime: " + arrivalTime + " time: " + time);
                     for(int i = 0; i < n; i++) {
-                        System.out.println("processor:" + (i+1) + ", arrivals");
+                        //System.out.println("processor:" + (i+1) + ", arrivals");
                         //System.out.println("jobArrayCounter" + jobArrayCounter + " backUpCounter: " + backUpCounter);
                         jobArray[i][jobArrayCounter[i]] = backUp[backUpCounter];
                         //printJobArray(jobArray[i], jobArrayCounter); // print the current job array
@@ -289,11 +290,12 @@ class Simulation {
                             //System.out.println("temp after update: "+ temp );
                             //System.out.println("arrivalTime after update: "+ arrivalTime );
                             if(jobsLeft == 0) temp = 0;
+                            backUpCounter++;
                             if(temp != arrivalTime) {
                                 arrivalTime = temp;
-                                backUpCounter++;
                                 //System.out.println("bAC"+backUpCounter);
                                 breakFlag = true;
+                                printFlag = true;
                             }
                         }
 
@@ -314,12 +316,14 @@ class Simulation {
                             breakFlag = false;
                             break;
                         }
-                    }
+                    } // end for
                 } // end if
 
-                System.out.println("0: "+ storage);
-                for(int i = 0; i < n; i++) {
-                    System.out.println((i+1) + ": " + processor[i]);
+                if(printFlag) {
+                    System.out.println("0: "+ storage);
+                    for(int i = 0; i < n; i++) {
+                        System.out.println((i+1) + ": " + processor[i]);
+                    }
                 }
 
                 // process next time
@@ -332,7 +336,10 @@ class Simulation {
                 }
 
                 // print the processors
-                System.out.println("time = " + time);
+                if(printFlag) {
+                    System.out.println("time = " + time);
+                    printFlag = false;
+                }
                 
 
             } // end while */
