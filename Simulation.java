@@ -187,7 +187,13 @@ class Simulation {
         int temp;
         int time;
         boolean breakFlag = false;
-        boolean printFlag = true;
+        boolean printFlag;
+
+        // for processing the wait times
+        int totalWaitTime;
+        float avgWaitTime;
+        int maxWaitTime;
+        int currentWaitTime;
 
         // run the program on n processor Queues
         for(int n = 1; n < m; n++) {
@@ -222,6 +228,10 @@ class Simulation {
             // initialize mL and mLC
             minLength = 0;
             minLengthCounter = n;
+
+            // reset waittime
+            totalWaitTime = 0;
+            maxWaitTime = 0;
 
             // initialize processor Queues and the job Array, cursor and counter
             Queue[] processor = new Queue[n];
@@ -263,6 +273,9 @@ class Simulation {
                                 if(!processor[i].isEmpty()) {
                                     dTime[i] = processFinishTime(jobArray, i, jobCursor[i], dTime[i]); 
                                     fTimeCounter = iSort(finishTimes, fTimeCurr, fTimeCounter, dTime[i]);
+                                    currentWaitTime = jobArray[i][jobCursor[i]].getWaitTime();
+                                    totalWaitTime += currentWaitTime;
+                                    maxWaitTime = Math.max(maxWaitTime,currentWaitTime);
                                 } else {
                                     dTime[i] = 1440;
                                 }
@@ -296,6 +309,9 @@ class Simulation {
                                 dTime[i] = processFinishTime(jobArray, i, jobCursor[i]-1, arrivalTime);
                                 fTimeCounter = iSort(finishTimes, fTimeCurr, fTimeCounter, dTime[i]);
                                 processor[i].enqueue(storage.dequeue());
+                                currentWaitTime = jobArray[i][jobCursor[i]-1].getWaitTime();
+                                totalWaitTime += currentWaitTime;
+                                maxWaitTime = Math.max(maxWaitTime,currentWaitTime);
                             } else {
                                 processor[i].enqueue(storage.dequeue());
                             }
@@ -333,6 +349,7 @@ class Simulation {
                             for(int j = 0; j < n; j++) {
                                 if(processor[j].length() == minLength) minLengthCounter++;
                             }
+                            breakFlag = true;
                         }
                         //trace.println("mL: " +minLength);
 
@@ -374,6 +391,17 @@ class Simulation {
                 trace.println((i+1) + ": " + processor[i]);
             }
             trace.println();
+
+            if(n == 1) {
+                report.print(n + " processor: ");
+            } else {
+                report.print(n + " processors: ");
+            }
+            avgWaitTime = (float)totalWaitTime/m;
+            report.print("totalWait=" + totalWaitTime + ", ");
+            report.print("maxWait=" + maxWaitTime + ", ");
+            report.printf("averageWait=%.2f", + avgWaitTime);
+            report.println();
 
             // reset the storage queue back to its original state
             resetBackUp(m, backUp, storage);
