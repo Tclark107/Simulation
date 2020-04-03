@@ -1,6 +1,3 @@
-This will be Queue ADT that will simulate shoppers lining up to be processed.
-
-TODO:
-The last thing I was working on was how minLength will work;
-will the last value of the array ever not be the shortest: answer is yes
-I need to figure out a way to keep track of the shortest length
+This project took me more than 10 days to complete.
+It is an algorithm that calculates how much wait time you have with m jobs and
+from 1 to m-1 processors.

@@ -11,11 +11,13 @@ import java.util.Arrays;
 
 class Simulation {
 
+    // if input is wrong print an error
     static void Usage() {
         System.err.println("Usage: java Simulation input_file");
         System.exit(0);
     }
 
+    // helper function that initializes backUp Job Array
     public static Job getJob(Scanner in) {
         String[] s = in.nextLine().split(" ");
         int a = Integer.parseInt(s[0]);
@@ -23,7 +25,6 @@ class Simulation {
         return new Job(a, d);
      }
 
-    // Test this after you write a Enqueue
     // resets the backUp[] job array and the storage Queue that we manipulate the other Queues with
     static void resetBackUp(int numOfJobs, Job[] arrayOfJobs, Queue storageQ) {
         storageQ.dequeueAll();
@@ -31,18 +32,6 @@ class Simulation {
             arrayOfJobs[i].resetFinishTime();
             storageQ.enqueue(arrayOfJobs[i]);
         }
-    }
-
-    // I dont think I need this because if you update a Job Array, it will update the Q
-    // this happens after the dQ call on the front
-    // it is to make sure that we only compute the first element in a queue
-    static void updateProcessor(Queue processor, int start, int end, Job[] proJobs) {
-        //trace.println("before dQAll"+processor)
-        if(!processor.isEmpty()) {
-            processor.dequeueAll();
-            //trace.println("after dQAll"+processor)
-        }
-        for(int i = start;i <= end;i++) processor.enqueue(proJobs[i]);
     }
 
     // helper function to print integer Array
@@ -63,9 +52,6 @@ class Simulation {
 
     // sort the finish times in order so they are easy to access
     static int iSort(int[] finishTimes,int start, int end, int newItem) {
-        //trace.print("list of fTimes: ");
-        //printArr(finishTimes);
-        //trace.println("fTCurr, FTcount, current p depart time:" + start+ ", " +end+ ", "+newItem);
         for (int i = start; i <= end; i++) {
             if(finishTimes[i] == newItem) {
                 return end;
@@ -83,15 +69,7 @@ class Simulation {
         return end;
     }
 
-    static void processArrival(Queue processor, Job nextJob, int time) {
-        if(processor.isEmpty()) {
-            nextJob.computeFinishTime(time);
-            processor.enqueue(nextJob);
-        } else {
-            processor.enqueue(nextJob);
-        }
-    }
-
+    // helper function that prints the current processor
     static void printProcessor(Job[][] jobArr, int processor) {
         System.out.print("This processor has the values: ");
         for(int i = 0; i < jobArr[processor].length; i++) {
@@ -102,13 +80,7 @@ class Simulation {
 
     // moves the jobCursor to the next element 
     static int processFinishTime(Job[][] jobArr, int processor, int currJob, int currentDTime) {
-        //trace.println("current time: " + currentDTime);
-        //trace.println("processor: " + processor + ", currJob: " + currJob);
-        //printProcessor(jobArr, processor);
         jobArr[processor][currJob].computeFinishTime(currentDTime);
-        //printProcessor(jobArr, processor);
-
-        //trace.println("the finish time at the current job on the job array: " + jobArr[processor][currJob].getFinish());
         return jobArr[processor][currJob].getFinish();
     }
 
@@ -119,16 +91,20 @@ class Simulation {
         myout.println();
     }
 
+    // helper function that prints Queue
     static void printQueue(Queue processor) {
         System.out.println("Queue:");
         System.out.println(processor);
     }
 
     public static void main(String[] args) throws IOException{
+        
+        // if user input is wrong print an err
         if(args.length!=1){
             Usage();
         }
         
+        // initialize out files
         Scanner in = new Scanner(new File(args[0]));
         PrintWriter report = new PrintWriter(new FileWriter(args[0]+".rpt"));
         PrintWriter trace = new PrintWriter(new FileWriter(args[0] + ".trc"));
@@ -259,9 +235,7 @@ class Simulation {
                 // loop through the processor queues do all jobs at time
                 // process departures at time
                 if(finishTimes[fTimeCurr] == time) {
-                    //trace.println("FinishTime at current: " + finishTimes[fTimeCurr] + ", time: " + time);
                     for (int i = 0; i < n; i++) {
-                        //trace.println("processor:" + (i+1) + ", departures");
                         if(dTime[i] == time) {
                             if(!processor[i].isEmpty()) {
                                 if(processor[i].length() == minLength) {
@@ -292,17 +266,8 @@ class Simulation {
 
                 // process arrivals at time
                 if (arrivalTime == time) {
-                    //trace.println("arrivaltime: " + arrivalTime + " time: " + time);
                     for(int i = 0; i < n; i++) {
-                        //trace.println("processor:" + (i+1) + ", arrivals");
-                        //trace.println("jobArrayCounter" + jobArrayCounter + " backUpCounter: " + backUpCounter);
                         jobArray[i][jobArrayCounter[i]] = backUp[backUpCounter];
-                        //printJobArray(jobArray[i], jobArrayCounter); // print the current job array
-                        // may or may not use this
-                        //processArrival(processor[i], jobArray[jobArrayCounter], time);
-                        //trace.println("mL: " + minLength + ", mLC: " + minLengthCounter);
-                        //trace.println("p.l(): " + processor[i].length());
-                        //trace.println("p[i]: " + processor[i]);
                         if(processor[i].length() == minLength) {
                             minLengthCounter--;
                             if(processor[i].isEmpty()) {
@@ -315,43 +280,29 @@ class Simulation {
                             } else {
                                 processor[i].enqueue(storage.dequeue());
                             }
-                            //trace.println("storage: "+storage);
-                            //trace.println("pi: "+ processor[i]);
-                            //printJobArray(backUp, m);
                             jobsActive++;
                             jobsLeft--;
                             jobArrayCounter[i]++;
-                            //trace.println("jAC: " + jobArrayCounter + " jA: " + jobsActive + " jL: "+jobsLeft );
 
                             // update arrival time and time
-                            //trace.println("bAC"+backUpCounter);
                             if(backUpCounter < m-1)temp = backUp[backUpCounter+1].getArrival();
-                            //trace.println("bAC"+backUpCounter);
-                            //trace.println("temp after update: "+ temp );
-                            //trace.println("arrivalTime after update: "+ arrivalTime );
                             if(jobsLeft == 0) temp = 0;
                             backUpCounter++;
                             if(temp != arrivalTime) {
                                 arrivalTime = temp;
-                                //trace.println("bAC"+backUpCounter);
                                 breakFlag = true;
                                 printFlag = true;
                             }
                         }
 
                         // if minLengthCounter is 0, loop through the processors and count the processors at mL
-                        //trace.println("mLC after enQ: " + minLengthCounter);
-                        //trace.println("mL after enQ: " + minLength + ", mLC after enQ: " + minLengthCounter);
                         if(minLengthCounter == 0) {
-                            //trace.println("p.len() if MLC is 0: " + processor[i].length());
                             minLength = processor[i].length();
-                            //trace.println("mL after change: " + minLength);
                             for(int j = 0; j < n; j++) {
                                 if(processor[j].length() == minLength) minLengthCounter++;
                             }
                             breakFlag = true;
                         }
-                        //trace.println("mL: " +minLength);
 
                         if(breakFlag) {
                             breakFlag = false;
@@ -360,8 +311,8 @@ class Simulation {
                     } // end for
                 } // end if
 
+                // if the time changed  and there are still jobs Active, print
                 if(printFlag && jobsActive != 0 && jobsLeft != m) {
-                    //trace.println("time = " + time);
                     trace.println("0: "+ storage);
                     for(int i = 0; i < n; i++) {
                         trace.println((i+1) + ": " + processor[i]);
@@ -370,8 +321,6 @@ class Simulation {
                 }
 
                 // process next time
-                //trace.println("jL:" + jobsLeft);
-                //trace.println("fT[curr]: " + finishTimes[fTimeCurr] + " aT: " + arrivalTime);
                 if(arrivalTime != 0) {
                     time = Math.min(finishTimes[fTimeCurr], arrivalTime);
                 } else {
@@ -386,12 +335,14 @@ class Simulation {
 
             } // end while */
 
+            // print the last iteration of processors
             trace.println("0: "+ storage);
             for(int i = 0; i < n; i++) {
                 trace.println((i+1) + ": " + processor[i]);
             }
             trace.println();
 
+            // print to report
             if(n == 1) {
                 report.print(n + " processor: ");
             } else {
