@@ -162,6 +162,8 @@ class Simulation {
         // a breakFlag for if the timechanges during arrivals
         int temp;
         int time;
+        int prevTime;
+        int nextTime;
         boolean breakFlag = false;
         boolean printFlag;
 
@@ -200,6 +202,8 @@ class Simulation {
             // initialize arrivalTime and FinishTime
             arrivalTime = backUp[backUpCounter].getArrival();
             temp = 0;
+            prevTime = 0;
+            nextTime = 0;
 
             // initialize mL and mLC
             minLength = 0;
@@ -220,14 +224,14 @@ class Simulation {
             printFlag = true;
 
             // print the processors
-            trace.println("time = " + time);
+            /*trace.println("time = " + time);
             if(jobsLeft == m && jobsActive ==0) {
                 trace.println("0: "+ storage);
                 for(int i = 0; i < n; i++) {
                     trace.println((i+1) + ": " + processor[i]);
                 }
                 trace.println();
-            }
+            }*/
 
             // while there are jobsLeft and processors still processing jobs, continue
             while(jobsLeft != 0 || jobsActive != 0) {
@@ -288,6 +292,12 @@ class Simulation {
                             if(backUpCounter < m-1)temp = backUp[backUpCounter+1].getArrival();
                             if(jobsLeft == 0) temp = 0;
                             backUpCounter++;
+                            //trace.println("aT: " + arrivalTime + ", temp: " + temp);
+                            //trace.println("printFlag: "+printFlag);
+                            //trace.println("processor: " + i);
+                            //trace.println("n: " + n);
+                            //if(i == n-1 && temp == arrivalTime) noPrintFlag = false;
+                            //trace.println("noprintFlag: "+noPrintFlag);
                             if(temp != arrivalTime) {
                                 arrivalTime = temp;
                                 breakFlag = true;
@@ -311,36 +321,50 @@ class Simulation {
                     } // end for
                 } // end if
 
-                // if the time changed  and there are still jobs Active, print
-                if(printFlag && jobsActive != 0 && jobsLeft != m) {
-                    trace.println("0: "+ storage);
-                    for(int i = 0; i < n; i++) {
-                        trace.println((i+1) + ": " + processor[i]);
-                    }
-                    trace.println();
-                }
-
+                // set previous time = time
+                //prevTime = time;
+                //trace.println("prevTime: " + prevTime);
+                
                 // process next time
                 if(arrivalTime != 0) {
-                    time = Math.min(finishTimes[fTimeCurr], arrivalTime);
+                    nextTime = Math.min(finishTimes[fTimeCurr], arrivalTime);
                 } else {
-                    time = finishTimes[fTimeCurr];
+                    nextTime = finishTimes[fTimeCurr];
                 }
+                //trace.println(" time: " +  time );
 
                 // print the processors
                 if(printFlag && time < 1440) {
-                    trace.println("time = " + time);
-                    printFlag = false;
+                    if(nextTime != time) {
+                        trace.println("time = " + time);
+                        //printFlag = false;
+                    }
+                }
+
+                // if the time changed and there are still jobs Active, print
+                //trace.println("pFlag = " + printFlag);
+                //trace.println("jobsActive = " + jobsActive);
+                //trace.println("jleft = " + jobsLeft);
+                if(printFlag) {
+                    //trace.println("am i here");
+                    if(nextTime != time) {
+                        trace.println("0: "+ storage);
+                        for(int i = 0; i < n; i++) {
+                            trace.println((i+1) + ": " + processor[i]);
+                        }
+                        trace.println();
+                        time = nextTime;
+                    }
                 }
 
             } // end while */
 
             // print the last iteration of processors
-            trace.println("0: "+ storage);
-            for(int i = 0; i < n; i++) {
-                trace.println((i+1) + ": " + processor[i]);
-            }
-            trace.println();
+            //trace.println("0: "+ storage);
+            //for(int i = 0; i < n; i++) {
+            //    trace.println((i+1) + ": " + processor[i]);
+            //}
+            //trace.println();
 
             // print to report
             if(n == 1) {
